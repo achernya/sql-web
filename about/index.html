@@ -1,0 +1,82 @@
+---
+layout: default
+title: About
+about: class="active"
+---
+<div class="page-header">
+  <h1>About <small>We're an open book</small></h1>
+</div>
+<h2 id="backups">
+  Nightly backups
+</h2>
+<p>
+  Around 4AM each day, two backups are performed: a monolithic backup
+  to restore the entire server in the event of a catastrophe, and an
+  individual backup for each user. At least 3 of the most recent
+  monolithic backups are kept at all times, in addition to some
+  historical backups that are encrypted and stored on separate
+  servers. The nightly, individual backups are available at
+  <code>/mit/sql/backup/</code>. The previous day's backup is also
+  available upon request.
+</p>
+<h2 id="software">
+  Software stack
+</h2>
+<p>
+  sql.mit.edu currently runs the community edition of MySQL. We'll be
+  upgrading to MariaDB, the newest version of the community-supported
+  MySQL, when the servers are upgraded
+  from <a href="http://www.debian.org/">Debian</a> 6.0 (squeeze) to
+  Debian 7.0 (wheezy). The servers run the latest version
+  of <a href="http://debathena.mit.edu/">Debathena</a> to integrate
+  with the MIT Athena computing environment.
+</p>
+<p>
+  All of the source code powering sql.mit.edu is open source under the
+  FIXME license. This includes
+  the <a href="https://github.com/achernya/sql-web">web
+  interface</a>, <a href="https://github.com/achernya/sql-backup">backup
+  scripts</a>, and
+  the <a href="https://github.com/achernya/sql-remctl">remote control
+  interface</a>. The server-side code is written almost entirely
+  in <a href="http://www.python.org/">Python</a>. The web interface is
+  written in HTML and Javascript.
+</p>
+<p>
+  Unlike most web applications at MIT, you can't log into sql.mit.edu
+  with a certificate. Instead, we
+  use <a href="https://webathena.mit.edu/">Webathena</a>, a web-based
+  implementation
+  of <a href="http://web.mit.edu/kerberos/">Kerberos</a>. Our servers
+  never learn your password. In fact, your password never leaves your
+  browser. Since the password isn't sent to the server, there's no
+  session to log in and out of&mdash;it's all in your browser.  This
+  also means that the sql.mit.edu website is immune to almost every
+  known web security vulnerability.
+</p>
+<h2 id="specs">
+  Server specifications
+</h2>
+<p>
+  sql.mit.edu has two identical servers,
+  named <code>primary-key</code> and <code>foreign-key</code>. Both of
+  these servers have
+  <ul>
+    <li>2x Intel Xeon E5430 (4x2.66GHz) CPUs</li>
+    <li>32GB DDR2-667 ECC RAM</li>
+    <li>2x2TB SATA Hard Drives in RAID1 (mirroring)</li>
+    <li>2x512GB SSDs in RAID1 (mirroring)</li>
+  </ul>
+</p>
+<h2 id="access">
+  Access and limitations
+</h2>
+<p>
+  Unlike most database providers, sql.mit.edu doesn't have any
+  restrictions on what client is used. However, since sql.mit.edu is
+  available to the entire MIT community, there is currently a 100
+  megabyte quota for all accounts. If you exceed this quota, you'll be
+  unable to make more databases, and the nightly backup will skip your
+  account for the individual backups. <a href="/contact/">Contact
+  us</a> to request a quota increase.
+</p>
