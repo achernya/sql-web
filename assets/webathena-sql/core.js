@@ -80,3 +80,20 @@ function updateLoginControls() {
     }
 }
 
+document.getElementById("not-signed-in").addEventListener("click", function (e) {
+    e.preventDefault();
+    getTicket().then(function(session) {
+        updateLoginControls();
+    });
+});
+document.getElementById("log-out").addEventListener("click", function (e) {
+    e.preventDefault();
+    destroyCachedTicket();
+    updateLoginControls();
+});
+
+!function ($) {
+    $(function() {
+	updateLoginControls();
+    })
+}(window.jQuery)
