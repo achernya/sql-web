@@ -1,0 +1,4 @@
+name: sql.mit.edu
+pygments: true
+include: ['assets']
+exclude: ['deploy.sh']

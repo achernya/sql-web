@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    {% include head.html %}
+    <link href="assets/css/jumbo-carousel.css" rel="stylesheet">
+  </head>
+  <body>
+    {% include navbar.html %}
+    {{ content }}
+    <div class="container">
+      {% include footer_basic.html %}
+    </div>
+    <!-- Placed at the end of the document so the pages load faster -->
+    {% include common-scripts.html %}
+    <script>
+      document.getElementById("not-signed-in").addEventListener("click", function (e) {
+          e.preventDefault();
+          getTicket().then(function(session) {
+              updateLoginControls();
+          });
+      });
+      document.getElementById("log-out").addEventListener("click", function (e) {
+          e.preventDefault();
+          destroyCachedTicket();
+          updateLoginControls();
+      });
+      updateLoginControls();
+    </script>
+  </body>
+</html>

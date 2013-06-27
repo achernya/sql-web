@@ -1,0 +1,44 @@
+<div class="navbar-wrapper">
+  <div class="container">
+    <div class="navbar navbar-inverse">
+      <div class="navbar-inner">
+        <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="brand" href="/">{{ site.name }}</a>
+        <div class="nav-collapse collapse">
+          <ul class="nav">
+            <li {{page.home}}><a href="/">Home</a></li>
+            <li {{page.signup}}><a href="/signup">Sign up</a></li>
+            <li {{page.contact}}><a href="/contact">Contact</a></li>
+            <li {{page.about}}><a href="/about">About</a></li>
+            <li {{page.donate}}><a href="/donate">Donate</a></li>
+            <li {{page.join}}><a href="/join">Join us</a></li>
+          </ul>
+	  <ul class="nav pull-right">
+	    <li class="dropdown" id="my-account" hidden>
+	      <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+		My account
+		<b class="caret"></b>
+	      </a>
+	      <ul class="dropdown-menu">
+                <li><a href="#profile">Edit profile</a></li>
+                <li><a href="#password">Change password</a></li>
+		<li class="divider"></li>
+		<li class="nav-header">Databases</li>
+		<li><a href="#manage">Manage</a></li>
+                <li><a href="https://sql.scripts.mit.edu/phpMyAdmin/">Edit data</a></li>
+		<li class="divider"></li>
+		<li class="nav-header">Session</li>
+		<li><a href="#" id="log-out">Log out (currently <span id="sql-username"></span>)</a></li>
+	      </ul>
+	    </li>
+	    <li id="not-signed-in"><a href="#">not signed in</a></li>
+	  </ul>
+        </div><!--/.nav-collapse -->
+      </div><!-- /.navbar-inner -->
+    </div><!-- /.navbar -->
+  </div> <!-- /.container -->
+</div><!-- /.navbar-wrapper -->
