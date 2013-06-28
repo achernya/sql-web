@@ -10,22 +10,21 @@ about: class="active"
   Nightly backups
 </h2>
 <p>
-  Around 4 AM each day, two backups are performed: a monolithic backup
-  to restore the entire server in the event of a catastrophe, and an
-  individual backup for each user. At least 3 of the most recent
-  monolithic backups are kept at all times, in addition to some
-  historical backups that are encrypted and stored on separate
-  servers. The nightly, individual backups are available at
-  <code>/mit/sql/backup/</code>. The previous day&rsquo;s backup is also
-  available upon request.
-</p>
+  (sufficient to restore the entire server in the event of a
+  catastrophe) and an individual backup for each user. We maintain at
+  least the three most recent monolithic backups at all times, in
+  addition to some historical backups encrypted and stored
+  off-site. The nightly, individual backups are available at
+  <code>/mit/sql/backup/</code>, and the previous day&rsquo;s backup
+  is also available upon request.
+/p>
 <h2 id="software">
   Software stack
 </h2>
 <p>
-  sql.mit.edu currently runs the community edition of
-  MySQL. We&rsquo;ll be upgrading to MariaDB, the newest version of
-  the community-supported MySQL, when the servers are upgraded
+  sql.mit.edu currently runs the community edition of MySQL.
+  We&rsquo;ll be upgrading to MariaDB, the newest version of the
+  community-supported MySQL, when the servers are upgraded
   from <a href="http://www.debian.org/">Debian</a> 6.0 (squeeze) to
   Debian 7.0 (wheezy). The servers run the latest version
   of <a href="http://debathena.mit.edu/">Debathena</a> to integrate
@@ -50,7 +49,7 @@ about: class="active"
   of <a href="http://web.mit.edu/kerberos/">Kerberos</a>. Our servers
   never learn your password. In fact, your password never leaves your
   browser. Since the password isn&rsquo;t sent to the server,
-  there&rsquo;s no session to log in and out of&mdash;it&rsquo;s all
+  there&rsquo;s no session to log in and out of &ndash; it&rsquo;s all
   in your browser.
 </p>
 <h2 id="specs">
