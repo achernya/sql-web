@@ -35,6 +35,13 @@ function destroyCachedTicket() {
     localStorage.removeItem("webathena.ticket");
 }
 
+function getCurrentLocker() {
+    if (!supportsLocalStorage()) {
+	return;
+    }
+    // TODO implement this to actually work...
+    return getCachedTicket().client.principalName.nameString[0];
+}
 
 function getTicket() {
     var deferred = Q.defer();
@@ -66,7 +73,6 @@ function getTicket() {
     });
     return deferred.promise;
 }
-
 
 function updateLoginControls() {
     var notSignedIn = document.getElementById("not-signed-in");
@@ -150,3 +156,29 @@ window.addEventListener("hashchange", function(ev) {
 	console.log("Unknown hash '" + location.hash + "' encountered");
     }
 });
+
+function registerModalListeners() {
+    var cpw = $('#change-password');
+    if (cpw) {
+	cpw.submit(function (e) {
+	    e.preventDefault();
+	    pw = $("#password").val();
+	    confirmPw = $("#confirmPassword").val()
+	    if (pw.length < 6) {
+		console.log("Password is too short");
+		return false;
+	    }
+	    if (pw === confirmPw) {
+		console.log("Passwords match, doing the remctl");
+		remctl(["password", "set", getCurrentLocker(), pw]).then(function (result) {
+		    console.log(result);
+		}).done();
+		return false;
+	    }
+	    console.log("Passwords do not match");
+	    return false;
+	});
+    }
+}
+
+$('#sql-modal').on('shown', registerModalListeners);
