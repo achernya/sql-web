@@ -157,6 +157,23 @@ window.addEventListener("hashchange", function(ev) {
     }
 });
 
+function showAlert(basename, heading, body, style) {
+    var alertTemplate = document.getElementById("alert-template");
+    var alertPlaceholder = document.getElementById(basename + "-placeholder");
+    if (alertPlaceholder) {
+	var alertNode = alertTemplate.cloneNode(true);
+	alertNode.id = "";
+	console.log(alertNode.children)
+	alertNode.getElementsByClassName("alert-template-head")[0].textContent = heading;
+	alertNode.getElementsByClassName("alert-template-body")[0].textContent = body;
+	alertNode.hidden = false;
+	if (style) {
+	    alertNode.classList.add(style);
+	}
+	alertPlaceholder.appendChild(alertNode);
+    }
+}
+
 function registerModalListeners() {
     var cpw = $('#change-password');
     if (cpw) {
@@ -165,17 +182,17 @@ function registerModalListeners() {
 	    pw = $("#password").val();
 	    confirmPw = $("#confirmPassword").val()
 	    if (pw.length < 6) {
-		console.log("Password is too short");
+		showAlert("password-alert", "Error!", "Password is too short.", "alert-error");
 		return false;
 	    }
 	    if (pw === confirmPw) {
-		console.log("Passwords match, doing the remctl");
+		showAlert("password-alert", "Processing!", "Please wait.");
 		remctl(["password", "set", getCurrentLocker(), pw]).then(function (result) {
-		    console.log(result);
+		    showAlert("password-alert", "Success!", "Password updated.", "alert-success");
 		}).done();
 		return false;
 	    }
-	    console.log("Passwords do not match");
+	    showAlert("password-alert", "Error", "Passwords do not match.", "alert-error");
 	    return false;
 	});
     }
