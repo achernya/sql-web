@@ -97,3 +97,56 @@ document.getElementById("log-out").addEventListener("click", function (e) {
 	updateLoginControls();
     })
 }(window.jQuery)
+
+var REMCTL_PROXY = "https://ctlfish-davidben.rhcloud.com:8443";
+function remctl(command) {
+    var server = "primary-key.mit.edu";
+    var peer = gss.Name.importName("host@" + server, gss.NT_HOSTBASED_SERVICE);
+    var credential = getCachedTicket();
+    var session = new RemctlSession(REMCTL_PROXY, peer, credential, server);
+    var streams = { };
+
+    function flushStreams() {
+	var overallLength = 0;
+	for (var i = 0; (i < chunks.length); i++) {
+	    overallLength += chunks[i].length;
+	}
+	var arr = new Uint8Array(overallLength);
+	overallLength = 0;
+	for (var i = 0; (i < chunks.length); i++) {
+	    arr.set(chunks[i], overallLength);
+	    overallLength += chunks[i].length;
+	}
+	return arrayutils.toUTF16(arr);
+    }
+
+    var chunks = [ ];
+    return session.ready().then(function() {
+        return session.command(command, function(stream, data) {
+	    chunks.push(data);
+        });
+    }).then(function(status) {
+        if (status) {
+            throw "Command exited with status: " + status;
+        }
+        return JSON.parse(flushStreams());
+    });
+}
+
+window.addEventListener("hashchange", function(ev) {
+    switch (location.hash) {
+    case "":
+    case "#":
+	// This is the hash that we changed to after we processed some
+	// event. Ignore it.
+	break;
+    case "#profile":
+	console.log("Got a profile click");
+	remctl(["account", "whoami"]).then(function (result) {
+	    console.log(result);
+	}).done();
+	break;
+    default:
+	console.log("Unknown hash '" + location.hash + "' encountered");
+    }
+});
