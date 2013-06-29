@@ -177,6 +177,7 @@ function showAlert(basename, heading, body, style) {
 function registerModalListeners() {
     var cpw = $('#change-password');
     if (cpw) {
+	cpw.unbind("submit");
 	cpw.submit(function (e) {
 	    e.preventDefault();
 	    pw = $("#password").val();
