@@ -104,7 +104,7 @@ document.getElementById("log-out").addEventListener("click", function (e) {
     })
 }(window.jQuery)
 
-var REMCTL_PROXY = "https://ctlfish-davidben.rhcloud.com:8443";
+var REMCTL_PROXY = "https://ctlfish-davidben.rhcloud.com:8443/socket";
 function remctl(command) {
     var server = "primary-key.mit.edu";
     var peer = gss.Name.importName("host@" + server, gss.NT_HOSTBASED_SERVICE);
@@ -123,7 +123,7 @@ function remctl(command) {
 	    arr.set(chunks[i], overallLength);
 	    overallLength += chunks[i].length;
 	}
-	return arrayutils.toUTF16(arr);
+	return arrayutils.toString(arr);
     }
 
     var chunks = [ ];
@@ -163,7 +163,6 @@ function showAlert(basename, heading, body, style) {
     if (alertPlaceholder) {
 	var alertNode = alertTemplate.cloneNode(true);
 	alertNode.id = "";
-	console.log(alertNode.children)
 	alertNode.getElementsByClassName("alert-template-head")[0].textContent = heading;
 	alertNode.getElementsByClassName("alert-template-body")[0].textContent = body;
 	alertNode.hidden = false;
