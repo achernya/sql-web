@@ -139,24 +139,6 @@ function remctl(command) {
     });
 }
 
-window.addEventListener("hashchange", function(ev) {
-    switch (location.hash) {
-    case "":
-    case "#":
-	// This is the hash that we changed to after we processed some
-	// event. Ignore it.
-	break;
-    case "#profile":
-	console.log("Got a profile click");
-	remctl(["account", "whoami"]).then(function (result) {
-	    console.log(result);
-	}).done();
-	break;
-    default:
-	console.log("Unknown hash '" + location.hash + "' encountered");
-    }
-});
-
 function showAlert(basename, heading, body, style) {
     var alertTemplate = document.getElementById("alert-template");
     var alertPlaceholder = document.getElementById(basename + "-placeholder");
@@ -196,6 +178,16 @@ function registerModalListeners() {
 	    return false;
 	});
     }
+    var profile = $('#change-profile');
+    if (profile) {
+	profile.unbind("submit");
+	profile.submit(function (e) {
+	    e.preventDefault();
+	});
+    }
 }
 
 $('#sql-modal').on('shown', registerModalListeners);
+$('#sql-modal').on('hidden', function() {
+    $(this).data('modal').$element.removeData();
+})
