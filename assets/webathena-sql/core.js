@@ -186,6 +186,22 @@ function registerModalListeners() {
     }
     var profile = $('#change-profile');
     if (profile) {
+        // Disable all input while we load up the profile.
+        profile.find("input").attr("disabled", "");
+        profile.find(":submit").attr("disabled", "");
+
+	showAlert("profile-alert", "Loading...", "Please wait.");
+
+        remctl(["profile", "get", getCurrentLocker()]).then(function (result) {
+            profile.find("input").removeAttr("disabled");
+            profile.find(":submit").removeAttr("disabled");
+
+            profile.find("#user-fullname").val(result.fullname);
+            profile.find("#user-email").val(result.email);
+        }, function (err) {
+            showAlert("profile-alert", "Error", "Failed to get profile: " + err, "alert-error");
+        });
+
 	profile.unbind("submit");
 	profile.submit(function (e) {
 	    e.preventDefault();
