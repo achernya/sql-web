@@ -139,6 +139,29 @@ function remctl(command) {
     });
 }
 
+function UserError(message) {
+    this.message = message;
+};
+UserError.prototype = Object.create(Error.prototype);
+UserError.prototype.constructor = UserError;
+UserError.prototype.name = "UserError";
+
+function sqlCommand(command) {
+    return remctl(command).then(function (result) {
+        if (result.status === 0) {
+            return result;
+        } else if (result.status === 1) {
+            throw new UserError(result.error);
+        } else if (result.status === 2) {
+            throw new Error(result.error);
+        } else {
+            if (window.console && console.error)
+                console.error(result);
+            throw new Error("Unknown status: " + result.status);
+        }
+    });
+}
+
 function showAlert(basename, heading, body, style) {
     var alertTemplate = document.getElementById("alert-template");
     var alertPlaceholder = document.getElementById(basename + "-placeholder");
@@ -170,7 +193,7 @@ function registerModalListeners() {
 	    if (pw === confirmPw) {
 		showAlert("password-alert", "Processing!", "Please wait.");
                 cpw.find(":submit").attr("disabled", "");
-		remctl(["password", "set", getCurrentLocker(), pw]).then(function (result) {
+		sqlCommand(["password", "set", getCurrentLocker(), pw]).then(function (result) {
 		    showAlert("password-alert", "Success!", "Password updated.", "alert-success");
 		}, function (err) {
                     showAlert("password-alert", "Error", "Failed to change password: " + err, "alert-error");
@@ -192,7 +215,7 @@ function registerModalListeners() {
 
 	showAlert("profile-alert", "Loading...", "Please wait.");
 
-        remctl(["profile", "get", getCurrentLocker()]).then(function (result) {
+        sqlCommand(["profile", "get", getCurrentLocker()]).then(function (result) {
             profile.find("input").removeAttr("disabled");
             profile.find(":submit").removeAttr("disabled");
 
