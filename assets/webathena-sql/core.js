@@ -163,19 +163,22 @@ function sqlCommand(command) {
 }
 
 function showAlert(basename, heading, body, style) {
-    var alertTemplate = document.getElementById("alert-template");
-    var alertPlaceholder = document.getElementById(basename + "-placeholder");
-    if (alertPlaceholder) {
-	var alertNode = alertTemplate.cloneNode(true);
-	alertNode.id = "";
-	alertNode.getElementsByClassName("alert-template-head")[0].textContent = heading;
-	alertNode.getElementsByClassName("alert-template-body")[0].textContent = body;
-	alertNode.hidden = false;
+    var alertTemplate = $("#alert-template");
+    var alertPlaceholder = $("#" + basename + "-placeholder");
+    if (alertPlaceholder.length > 0) {
+	var alertNode = alertTemplate.clone().removeAttr("id");
+        alertNode.find(".alert-template-head").text(heading);
+        alertNode.find(".alert-template-body").text(body);
+        alertNode.removeAttr("hidden");
 	if (style) {
-	    alertNode.classList.add(style);
+            alertNode.addClass(style);
 	}
-	alertPlaceholder.appendChild(alertNode);
+	alertPlaceholder.append(alertNode);
     }
+}
+
+function clearAlerts(basename) {
+    $("#" + basename + "-placeholder").empty();
 }
 
 function registerModalListeners() {
@@ -184,6 +187,7 @@ function registerModalListeners() {
 	cpw.unbind("submit");
 	cpw.submit(function (e) {
 	    e.preventDefault();
+            clearAlerts("password-alert");
 	    pw = $("#password").val();
 	    confirmPw = $("#confirmPassword").val()
 	    if (pw.length < 6) {
@@ -193,13 +197,14 @@ function registerModalListeners() {
 	    if (pw === confirmPw) {
 		showAlert("password-alert", "Processing!", "Please wait.");
                 cpw.find(":submit").attr("disabled", "");
-		sqlCommand(["password", "set", getCurrentLocker(), pw]).then(function (result) {
+		sqlCommand(["password", "set", getCurrentLocker(), pw]).finally(function () {
+                    clearAlerts("password-alert");
+                    cpw.find(":submit").removeAttr("disabled");
+                }).then(function (result) {
 		    showAlert("password-alert", "Success!", "Password updated.", "alert-success");
 		}, function (err) {
                     showAlert("password-alert", "Error", "Failed to change password: " + err, "alert-error");
                     throw err;
-                }).finally(function () {
-                    cpw.find(":submit").removeAttr("disabled");
                 }).done();
 		return false;
 	    }
@@ -215,7 +220,9 @@ function registerModalListeners() {
 
 	showAlert("profile-alert", "Loading...", "Please wait.");
 
-        sqlCommand(["profile", "get", getCurrentLocker()]).then(function (result) {
+        sqlCommand(["profile", "get", getCurrentLocker()]).finally(function () {
+            clearAlerts("profile-alert");
+        }).then(function (result) {
             // Re-enable input.
             profile.find("input").removeAttr("disabled");
             profile.find(":submit").removeAttr("disabled");
@@ -227,6 +234,7 @@ function registerModalListeners() {
             // NOW hook up the form.
 	    profile.submit(function (e) {
 	        e.preventDefault();
+                clearAlerts("profile-alert");
 
                 var fullname = profile.find("#user-fullname").val();
                 var email = profile.find("#user-email").val();
@@ -237,19 +245,20 @@ function registerModalListeners() {
 
 		showAlert("profile-alert", "Processing!", "Please wait.");
                 cpw.find(":submit").attr("disabled", "");
-		sqlCommand(["profile", "set", getCurrentLocker(), profileStr]).then(function (result) {
+		sqlCommand(["profile", "set", getCurrentLocker(), profileStr]).finally(function () {
+                    clearAlerts("profile-alert");
+                    cpw.find(":submit").removeAttr("disabled");
+                }).then(function (result) {
 		    showAlert("profile-alert", "Success!", "Profile updated.", "alert-success");
 		}, function (err) {
                     showAlert("profile-alert", "Error", "Failed to change profile: " + err, "alert-error");
                     throw err;
-                }).finally(function () {
-                    cpw.find(":submit").removeAttr("disabled");
                 }).done();
 		return false;
 	    });
         }, function (err) {
             showAlert("profile-alert", "Error", "Failed to get profile: " + err, "alert-error");
-        });
+        }).done();
 
 	profile.unbind("submit");
     }
