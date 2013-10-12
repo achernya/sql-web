@@ -132,7 +132,7 @@ function remctl(command) {
 	    chunks.push(data);
         });
     }).then(function(status) {
-        if (status) {
+        if (status !== 0 && status !== 1) {
             throw "Command exited with status: " + status;
         }
         return JSON.parse(flushStreams());
