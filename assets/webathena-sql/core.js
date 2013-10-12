@@ -169,9 +169,15 @@ function registerModalListeners() {
 	    }
 	    if (pw === confirmPw) {
 		showAlert("password-alert", "Processing!", "Please wait.");
+                cpw.find(":submit").attr("disabled", "");
 		remctl(["password", "set", getCurrentLocker(), pw]).then(function (result) {
 		    showAlert("password-alert", "Success!", "Password updated.", "alert-success");
-		}).done();
+		}, function (err) {
+                    showAlert("password-alert", "Error", "Failed to change password: " + err, "alert-error");
+                    throw err;
+                }).finally(function () {
+                    cpw.find(":submit").removeAttr("disabled");
+                }).done();
 		return false;
 	    }
 	    showAlert("password-alert", "Error", "Passwords do not match.", "alert-error");
