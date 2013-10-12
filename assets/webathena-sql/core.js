@@ -216,19 +216,42 @@ function registerModalListeners() {
 	showAlert("profile-alert", "Loading...", "Please wait.");
 
         sqlCommand(["profile", "get", getCurrentLocker()]).then(function (result) {
+            // Re-enable input.
             profile.find("input").removeAttr("disabled");
             profile.find(":submit").removeAttr("disabled");
 
+            // Fill in the form.
             profile.find("#user-fullname").val(result.fullname);
             profile.find("#user-email").val(result.email);
+
+            // NOW hook up the form.
+	    profile.submit(function (e) {
+	        e.preventDefault();
+
+                var fullname = profile.find("#user-fullname").val();
+                var email = profile.find("#user-email").val();
+                var profileStr = JSON.stringify({
+                    fullname: fullname,
+                    email: email
+                });
+
+		showAlert("profile-alert", "Processing!", "Please wait.");
+                cpw.find(":submit").attr("disabled", "");
+		sqlCommand(["profile", "set", getCurrentLocker(), profileStr]).then(function (result) {
+		    showAlert("profile-alert", "Success!", "Profile updated.", "alert-success");
+		}, function (err) {
+                    showAlert("profile-alert", "Error", "Failed to change profile: " + err, "alert-error");
+                    throw err;
+                }).finally(function () {
+                    cpw.find(":submit").removeAttr("disabled");
+                }).done();
+		return false;
+	    });
         }, function (err) {
             showAlert("profile-alert", "Error", "Failed to get profile: " + err, "alert-error");
         });
 
 	profile.unbind("submit");
-	profile.submit(function (e) {
-	    e.preventDefault();
-	});
     }
 }
 
