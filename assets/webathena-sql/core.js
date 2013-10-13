@@ -188,8 +188,8 @@ function registerModalListeners() {
 	cpw.submit(function (e) {
 	    e.preventDefault();
             clearAlerts("password-alert");
-	    pw = $("#password").val();
-	    confirmPw = $("#confirmPassword").val()
+	    pw = cpw.find(".field-password").val();
+	    confirmPw = cpw.find(".field-confirmPassword").val()
 	    if (pw.length < 6) {
 		showAlert("password-alert", "Error!", "Password is too short.", "alert-error");
 		return false;
@@ -228,16 +228,16 @@ function registerModalListeners() {
             profile.find(":submit").removeAttr("disabled");
 
             // Fill in the form.
-            profile.find("#user-fullname").val(result.fullname);
-            profile.find("#user-email").val(result.email);
+            profile.find(".field-user-fullname").val(result.fullname);
+            profile.find(".field-user-email").val(result.email);
 
             // NOW hook up the form.
 	    profile.submit(function (e) {
 	        e.preventDefault();
                 clearAlerts("profile-alert");
 
-                var fullname = profile.find("#user-fullname").val();
-                var email = profile.find("#user-email").val();
+                var fullname = profile.find(".field-user-fullname").val();
+                var email = profile.find(".field-user-email").val();
                 var profileStr = JSON.stringify({
                     fullname: fullname,
                     email: email
