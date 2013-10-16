@@ -104,9 +104,9 @@ document.getElementById("log-out").addEventListener("click", function (e) {
     })
 }(window.jQuery)
 
-var REMCTL_PROXY = "https://ctlfish-davidben.rhcloud.com:8443/socket";
+var REMCTL_PROXY = "https://ctlfish.mit.edu/socket";
 function remctl(command) {
-    var server = "primary-key.mit.edu";
+    var server = "sql.mit.edu";
     var peer = gss.Name.importName("host@" + server, gss.NT_HOSTBASED_SERVICE);
     var credential = getCachedTicket();
     var session = new RemctlSession(REMCTL_PROXY, peer, credential, server);
