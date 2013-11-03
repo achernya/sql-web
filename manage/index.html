@@ -1,0 +1,73 @@
+---
+layout: default
+title: Manage databases
+manage: class="active"
+extra_scripts: <script src="/assets/webathena-sql/manage.js"></script>
+---
+<div class="page-header">
+  <h1>Manage databases <small>At your service</small></h1>
+</div>
+
+<div hidden id="drop-confirm-template" class="modal hide fade">
+  <div class="modal-header">
+    <button type="button" class="part-cancel-button close" aria-hidden="true">&times;</button>
+    <h3>Are you sure?</h3>
+  </div>
+  <div class="modal-body">
+    <p>This will permanently delete all data
+      from <code class="field-database">davidben+db</code>. There is no
+      going back. Did you take
+      a <a href="https://scripts.mit.edu/faq/10"
+           target="_blank">backup</a>?</p>
+  </div>
+  <div class="modal-footer">
+    <a href="#" class="part-cancel-button btn">Cancel</a>
+    <a href="#" class="part-confirm-button btn btn-danger">Drop database</a>
+  </div>
+</div>
+
+<div id="manage-alert-placeholder">
+</div>
+
+<p>
+  Using <span class="field-used-size"></span> out
+  of <span class="field-quota"></span>
+  (<span class="field-used-percent"></span>%).
+</p>
+<table class="table table-striped table-hover table-bordered">
+  <thead>
+    <tr>
+      <th class="span12">Database</th>
+      <th>Size</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody class="field-database-tbody">
+<!--
+    TODO(davidben): Make this a template instead of transcribing to
+    jQuery in manage.js:createRow. Need a dummy table to contain it.
+
+    <tr>
+      <td><code class="noborder">davidben+mangoes</code></td>
+      <td>45.31MB</td>
+      <td><button type="button" class="btn btn-danger btn-small">Drop</button></td>
+    </tr>
+    <tr>
+      <td><code class="noborder">davidben+monkeys</code></td>
+      <td>9.31TB</td>
+      <td><button type="button" class="btn btn-danger btn-small">Drop</button></td>
+    </tr>
+-->
+  </tbody>
+</table>
+<form class="form-inline">
+  <fieldset>
+    <legend>New database</legend>
+    <div class="input-prepend database-field">
+      <span class="add-on"><span class="field-locker-name">davidben</span>+</span>
+      <input class="field-database-name" type="text" placeholder="database-name">
+    </div>
+    <button type="submit" class="btn btn-primary">Create</button>
+  </fieldset>
+</form>
+<p><em>Limit of 10 databases.</em></p>
