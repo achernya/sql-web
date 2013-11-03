@@ -83,7 +83,7 @@ function refreshInfo() {
     var locker = getCurrentLocker();
     $(".field-locker-name").text(locker);
     clearAlerts("manage-alert");
-    // showAlert("manage-alert", "Loading...", "Please wait.");
+    showAlert("manage-alert", "Loading...", "Please wait.");
     sqlCommand(["database", "list", locker]).finally(function() {
         clearAlerts("manage-alert");
     }).then(function(data) {
