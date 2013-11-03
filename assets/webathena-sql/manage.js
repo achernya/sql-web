@@ -107,6 +107,7 @@ function setupForms() {
             form.find(":submit").removeAttr("disabled");
             clearAlerts("create-alert");
         }).then(function() {
+            form.find(".field-database-name").val("");
             refreshInfo();
         }, function(err) {
             // TODO(davidben): Distinguish UserError from others.
