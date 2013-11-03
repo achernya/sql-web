@@ -92,10 +92,13 @@ function refreshInfo() {
 
         var tbody = $(".field-database-tbody");
         tbody.empty();
-        for (var i = 0; i < data.databases.length; i++) {
-            totalSize += data.databases[i].size;
-            tbody.append(createRow(data.databases[i].name,
-                                   data.databases[i].size));
+        var databases = data.databases.slice(0);
+        databases.sort(function(a, b) {
+            return a.name.localeCompare(b.name);
+        });
+        for (var i = 0; i < databases.length; i++) {
+            totalSize += databases[i].size;
+            tbody.append(createRow(databases[i].name, databases[i].size));
         }
 
         $(".field-used-size").text(formatSize(totalSize));
