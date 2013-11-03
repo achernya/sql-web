@@ -26,13 +26,12 @@ extra_scripts: <script src="/assets/webathena-sql/manage.js"></script>
   </div>
 </div>
 
-<div id="manage-alert-placeholder">
-</div>
+<div id="manage-alert-placeholder"></div>
 
 <p>
-  Using <span class="field-used-size"></span> out
-  of <span class="field-quota"></span>
-  (<span class="field-used-percent"></span>%).
+  Using <span class="field-used-size">0 MB</span> out
+  of <span class="field-quota">0 MB</span>
+  (<span class="field-used-percent">0</span>%).
 </p>
 <table class="table table-striped table-hover table-bordered">
   <thead>
@@ -60,7 +59,7 @@ extra_scripts: <script src="/assets/webathena-sql/manage.js"></script>
 -->
   </tbody>
 </table>
-<form class="form-inline">
+<form class="form-inline" id="database-create-form">
   <fieldset>
     <legend>New database</legend>
     <div class="input-prepend database-field">
@@ -70,4 +69,5 @@ extra_scripts: <script src="/assets/webathena-sql/manage.js"></script>
     <button type="submit" class="btn btn-primary">Create</button>
   </fieldset>
 </form>
+<div id="create-alert-placeholder"></div>
 <p><em>Limit of 10 databases.</em></p>

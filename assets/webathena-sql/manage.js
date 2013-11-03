@@ -29,6 +29,8 @@ function showConfirmDialog(database) {
 }
 
 function formatSize(bytes) {
+    if (bytes == 0)
+        return "0\xA0MB";
     var suffixes = ["bytes", "kB", "MB",
                     // Eh, why not? :-D
                     "GB", "TB", "PB", "EB", "ZB", "YB"];
@@ -60,10 +62,14 @@ function createRow(name, size) {
     return tr;
 }
 
-function loadInfo() {
+function refreshInfo() {
     var locker = getCurrentLocker();
     $(".field-locker-name").text(locker);
-    sqlCommand(["database", "list", locker]).then(function(data) {
+    clearAlerts("manage-alert");
+    // showAlert("manage-alert", "Loading...", "Please wait.");
+    sqlCommand(["database", "list", locker]).finally(function() {
+        clearAlerts("manage-alert");
+    }).then(function(data) {
         var totalSize = 0;
 
         var tbody = $(".field-database-tbody");
@@ -78,9 +84,36 @@ function loadInfo() {
         $(".field-quota").text(formatSize(data.quota));
         $(".field-used-percent").text(((totalSize / data.quota) * 100).toFixed(1));
     }, function(err) {
-        // FIXME!
-        alert(err);
+        // TODO(davidben): Distinguish UserError from others.
+        showAlert("manage-alert", "Error", err, "alert-error");
+    }).done();
+}
+
+function setupForms() {
+    var form = $("#database-create-form");
+    form.submit(function(ev) {
+        ev.preventDefault();
+        var name = form.find(".field-database-name").val();
+        if (!name)
+            return;
+
+        var locker = getCurrentLocker();
+
+        clearAlerts("create-alert");
+        showAlert("create-alert", "Creating database...", "Please wait.");
+        form.find(":submit").attr("disabled", "");
+
+        sqlCommand(["database", "create", locker, name]).finally(function() {
+            form.find(":submit").removeAttr("disabled");
+            clearAlerts("create-alert");
+        }).then(function() {
+            refreshInfo();
+        }, function(err) {
+            // TODO(davidben): Distinguish UserError from others.
+            showAlert("create-alert", "Error", err, "alert-error");
+        }).done();
     });
 }
 
-loadInfo();
+refreshInfo();
+setupForms();
