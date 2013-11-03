@@ -104,11 +104,20 @@ document.getElementById("log-out").addEventListener("click", function (e) {
     })
 }(window.jQuery)
 
+function NoCredentialsError() {
+    this.message = "Not logged in";
+};
+NoCredentialsError.prototype = Object.create(Error.prototype);
+NoCredentialsError.prototype.constructor = NoCredentialsError;
+NoCredentialsError.prototype.name = "NoCredentialsError";
+
 var REMCTL_PROXY = "https://ctlfish.mit.edu/socket";
 function remctl(command) {
     var server = "sql.mit.edu";
     var peer = gss.Name.importName("host@" + server, gss.NT_HOSTBASED_SERVICE);
     var credential = getCachedTicket();
+    if (!credential)
+        return Q.reject(new NoCredentialsError());
     var session = new RemctlSession(REMCTL_PROXY, peer, credential, server);
     var streams = { };
 
