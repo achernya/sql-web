@@ -80,6 +80,7 @@ function createRow(name, size) {
 }
 
 function refreshInfo() {
+    // TODO(davidben): Handle the case when you're not logged in, etc.
     var locker = getCurrentLocker();
     $(".field-locker-name").text(locker);
     clearAlerts("manage-alert");
