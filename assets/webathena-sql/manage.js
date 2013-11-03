@@ -55,7 +55,24 @@ function createRow(name, size) {
         showConfirmDialog(name).then(function(result) {
             if (!result)
                 return;
-            alert("Yeah, not implementing you yet.");
+
+            // Kludge: the API wants short names, but gives back long
+            // names.
+            var locker = getCurrentLocker();
+            if (name.substring(0, locker.length + 1) != locker + "+")
+                throw new Error("Locker/DB name mismatch!");
+            var shortName = name.substring(locker.length + 1);
+
+            clearAlerts("manage-alert");
+            showAlert("manage-alert", "Dropping database...", "Please wait.");
+            sqlCommand(["database", "drop", locker, shortName]).finally(function() {
+                clearAlerts("manage-alert");
+            }).then(function() {
+                refreshInfo();
+            }, function(err) {
+                // TODO(davidben): Distinguish UserError from others.
+                showAlert("manage-alert", "Error", err, "alert-error");
+            });
         }).done();
     });
     tr.append($("<td>").append(button));
