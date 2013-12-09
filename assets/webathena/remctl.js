@@ -1,7 +1,5 @@
 "use strict";
 
-var WEBATHENA_HOST = "https://webathena.mit.edu";
-
 // Socket proxy errors.
 var ERR_BAD_FORMAT = 4000;
 var ERR_BAD_PARAMS = 4001;
@@ -122,11 +120,11 @@ function RemctlSocket(proxy, host, port) {
                 }
             }
         } else {
-            console.log('Unexpected message', msg);
+            if (window.console && console.log)
+                console.log('Unexpected message', msg);
         }
     }.bind(this));
     this.socket.addEventListener('close', function(ev) {
-        console.log(this);
         if (ev.code === 1000) {
             this.disconnect();
         } else {

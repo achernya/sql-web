@@ -104,11 +104,20 @@ document.getElementById("log-out").addEventListener("click", function (e) {
     })
 }(window.jQuery)
 
-var REMCTL_PROXY = "https://ctlfish-davidben.rhcloud.com:8443/socket";
+function NoCredentialsError() {
+    this.message = "Not logged in";
+};
+NoCredentialsError.prototype = Object.create(Error.prototype);
+NoCredentialsError.prototype.constructor = NoCredentialsError;
+NoCredentialsError.prototype.name = "NoCredentialsError";
+
+var REMCTL_PROXY = "https://ctlfish.mit.edu/socket";
 function remctl(command) {
-    var server = "primary-key.mit.edu";
+    var server = "sql.mit.edu";
     var peer = gss.Name.importName("host@" + server, gss.NT_HOSTBASED_SERVICE);
     var credential = getCachedTicket();
+    if (!credential)
+        return Q.reject(new NoCredentialsError());
     var session = new RemctlSession(REMCTL_PROXY, peer, credential, server);
     var streams = { };
 
@@ -132,27 +141,53 @@ function remctl(command) {
 	    chunks.push(data);
         });
     }).then(function(status) {
-        if (status) {
+        if (status !== 0 && status !== 1) {
             throw "Command exited with status: " + status;
         }
         return JSON.parse(flushStreams());
     });
 }
 
+function UserError(message) {
+    this.message = message;
+};
+UserError.prototype = Object.create(Error.prototype);
+UserError.prototype.constructor = UserError;
+UserError.prototype.name = "UserError";
+
+function sqlCommand(command) {
+    return remctl(command).then(function (result) {
+        if (result.status === 0) {
+            return result;
+        } else if (result.status === 1) {
+            throw new UserError(result.error);
+        } else if (result.status === 2) {
+            throw new Error(result.error);
+        } else {
+            if (window.console && console.error)
+                console.error(result);
+            throw new Error("Unknown status: " + result.status);
+        }
+    });
+}
+
 function showAlert(basename, heading, body, style) {
-    var alertTemplate = document.getElementById("alert-template");
-    var alertPlaceholder = document.getElementById(basename + "-placeholder");
-    if (alertPlaceholder) {
-	var alertNode = alertTemplate.cloneNode(true);
-	alertNode.id = "";
-	alertNode.getElementsByClassName("alert-template-head")[0].textContent = heading;
-	alertNode.getElementsByClassName("alert-template-body")[0].textContent = body;
-	alertNode.hidden = false;
+    var alertTemplate = $("#alert-template");
+    var alertPlaceholder = $("#" + basename + "-placeholder");
+    if (alertPlaceholder.length > 0) {
+	var alertNode = alertTemplate.clone().removeAttr("id");
+        alertNode.find(".alert-template-head").text(heading);
+        alertNode.find(".alert-template-body").text(body);
+        alertNode.removeAttr("hidden");
 	if (style) {
-	    alertNode.classList.add(style);
+            alertNode.addClass(style);
 	}
-	alertPlaceholder.appendChild(alertNode);
+	alertPlaceholder.append(alertNode);
     }
+}
+
+function clearAlerts(basename) {
+    $("#" + basename + "-placeholder").empty();
 }
 
 function registerModalListeners() {
@@ -161,17 +196,25 @@ function registerModalListeners() {
 	cpw.unbind("submit");
 	cpw.submit(function (e) {
 	    e.preventDefault();
-	    pw = $("#password").val();
-	    confirmPw = $("#confirmPassword").val()
+            clearAlerts("password-alert");
+	    pw = cpw.find(".field-password").val();
+	    confirmPw = cpw.find(".field-confirmPassword").val()
 	    if (pw.length < 6) {
 		showAlert("password-alert", "Error!", "Password is too short.", "alert-error");
 		return false;
 	    }
 	    if (pw === confirmPw) {
 		showAlert("password-alert", "Processing!", "Please wait.");
-		remctl(["password", "set", getCurrentLocker(), pw]).then(function (result) {
+                cpw.find(":submit").attr("disabled", "");
+		sqlCommand(["password", "set", getCurrentLocker(), pw]).finally(function () {
+                    clearAlerts("password-alert");
+                    cpw.find(":submit").removeAttr("disabled");
+                }).then(function (result) {
 		    showAlert("password-alert", "Success!", "Password updated.", "alert-success");
-		}).done();
+		}, function (err) {
+                    showAlert("password-alert", "Error", "Failed to change password: " + err, "alert-error");
+                    throw err;
+                }).done();
 		return false;
 	    }
 	    showAlert("password-alert", "Error", "Passwords do not match.", "alert-error");
@@ -180,10 +223,53 @@ function registerModalListeners() {
     }
     var profile = $('#change-profile');
     if (profile) {
+        // Disable all input while we load up the profile.
+        profile.find("input").attr("disabled", "");
+        profile.find(":submit").attr("disabled", "");
+
+	showAlert("profile-alert", "Loading...", "Please wait.");
+
+        sqlCommand(["profile", "get", getCurrentLocker()]).finally(function () {
+            clearAlerts("profile-alert");
+        }).then(function (result) {
+            // Re-enable input.
+            profile.find("input").removeAttr("disabled");
+            profile.find(":submit").removeAttr("disabled");
+
+            // Fill in the form.
+            profile.find(".field-user-fullname").val(result.fullname);
+            profile.find(".field-user-email").val(result.email);
+
+            // NOW hook up the form.
+	    profile.submit(function (e) {
+	        e.preventDefault();
+                clearAlerts("profile-alert");
+
+                var fullname = profile.find(".field-user-fullname").val();
+                var email = profile.find(".field-user-email").val();
+                var profileStr = JSON.stringify({
+                    fullname: fullname,
+                    email: email
+                });
+
+		showAlert("profile-alert", "Processing!", "Please wait.");
+                cpw.find(":submit").attr("disabled", "");
+		sqlCommand(["profile", "set", getCurrentLocker(), profileStr]).finally(function () {
+                    clearAlerts("profile-alert");
+                    cpw.find(":submit").removeAttr("disabled");
+                }).then(function (result) {
+		    showAlert("profile-alert", "Success!", "Profile updated.", "alert-success");
+		}, function (err) {
+                    showAlert("profile-alert", "Error", "Failed to change profile: " + err, "alert-error");
+                    throw err;
+                }).done();
+		return false;
+	    });
+        }, function (err) {
+            showAlert("profile-alert", "Error", "Failed to get profile: " + err, "alert-error");
+        }).done();
+
 	profile.unbind("submit");
-	profile.submit(function (e) {
-	    e.preventDefault();
-	});
     }
 }
 
