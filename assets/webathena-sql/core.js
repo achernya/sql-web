@@ -39,8 +39,18 @@ function getCurrentLocker() {
     if (!supportsLocalStorage()) {
         return;
     }
-    // TODO implement this to actually work...
-    return getCachedTicket().client.principalName.nameString[0];
+    var stored_locker = localStorage["sql.locker"];
+    if (!stored_locker) {
+        stored_locker = getCachedTicket().client.principalName.nameString[0];
+    }
+    return stored_locker;
+}
+
+function setCurrentLocker(locker) {
+    if (!supportsLocalStorage()) {
+        return;
+    }
+    localStorage["sql.locker"] = locker;
 }
 
 function getTicket() {
@@ -83,7 +93,13 @@ function updateLoginControls() {
     if (session) {
         var username = document.getElementById("sql-username");
         username.textContent = session.client.principalName.nameString[0];
+        updateLockerControls();
     }
+}
+
+function updateLockerControls() {
+    var locker = document.getElementById("sql-locker");
+    locker.textContent = getCurrentLocker();
 }
 
 document.getElementById("not-signed-in").addEventListener("click", function (e) {
@@ -270,6 +286,38 @@ function registerModalListeners() {
         }).done();
 
         profile.unbind("submit");
+    }
+    var locker = $('#change-locker');
+    if (locker) {
+        locker.find("input").attr("disabled", "");
+        locker.find(":submit").attr("disabled", "");
+
+        locker.find(".field-locker-name").val(getCurrentLocker());
+        locker.unbind("submit");
+        locker.submit(function (e) {
+            e.preventDefault();
+            var proposed_locker = locker.find(".field-locker-name").val();
+            showAlert("locker-alert", "Switching!", "Please wait.");
+            locker.find(":submit").attr("disabled", "");
+            sqlCommand(["account", "is-auth", proposed_locker]).finally(function () {
+                clearAlerts("locker-alert");
+                locker.find(":submit").removeAttr("disabled");
+            }).then(function (result) {
+                if (result.result) {
+                    showAlert("locker-alert", "Success!", "Switched lockers.", "alert-success");
+                    setCurrentLocker(proposed_locker);
+                    updateLockerControls();
+                } else {
+                    showAlert("locker-alert", "Permission denied.",
+                              "No permission to administer requested locker", "alert-error");
+                }
+            }, function (err) {
+                showAlert("locker-alert", "Error", "Failed to switch locker: " + err, "alert-error");
+                throw err;
+            }).done();
+        });
+        locker.find("input").removeAttr("disabled");
+        locker.find(":submit").removeAttr("disabled");
     }
 }
 
