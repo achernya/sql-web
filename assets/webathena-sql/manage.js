@@ -1,3 +1,4 @@
+
 function showConfirmDialog(database) {
     var deferred = Q.defer();
 
